@@ -75,7 +75,7 @@ def get_calendar(data: dict, limit: int=31) -> str:
 				for node in nodes:
 					info.append(node.text)
 		msg = '\n'.join(info)
-		if not msg: break
+		if not msg: continue
 		result.append('\n'.join(['----------', date.strftime('%Y-%m-%d'), msg]))
 	return '\n'.join(result)
 
