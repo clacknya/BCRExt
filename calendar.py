@@ -76,7 +76,7 @@ def get_calendar(data: dict, limit: int=31) -> str:
 					info.append(node.text)
 		msg = '\n'.join(info)
 		if not msg: continue
-		result.append('\n'.join(['----------', date.strftime('%Y-%m-%d'), msg]))
+		result.append('\n'.join(['==========', date.strftime('%Y-%m-%d'), msg]))
 	return '\n'.join(result)
 
 async def scheduled_data():
