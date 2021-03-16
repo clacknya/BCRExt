@@ -20,11 +20,16 @@ TIMEAPAN = {
 	'国服今日活动':   1,
 }
 
-sv = Service('公主连结国服日程表',
+# CST timezone
+TZ = datetime.timezone(datetime.timedelta(hours=+8))
+
+sv_query = Service('公主连结国服日程查询',
 	help_='\n'.join([f'[{k}] 查询最长{TIMEAPAN[k]}天日程' for k in TIMEAPAN]))
 
+sv_push = Service('公主连结国服日程推送', help_='每日推送当日日程')
+
 async def get_raw_data() -> list:
-	sv.logger.info(f'GET {URL_CALENDAR}')
+	sv_query.logger.info(f'GET {URL_CALENDAR}')
 	r = await get(URL_CALENDAR)
 	m = re.search(r'\bdata\s*=\s*(?=\[)(?P<json>.+)(?<=\])', await r.text, flags=re.DOTALL)
 	if m is not None:
@@ -49,8 +54,7 @@ def parse_raw_data(raw_data: list) -> dict:
 
 def get_calendar(data: dict, limit: int=31) -> str:
 	result = []
-	# CST timezone
-	now = datetime.datetime.now(tz=datetime.timezone(datetime.timedelta(hours=+8)))
+	now = datetime.datetime.now(tz=TZ)
 	for days in range(limit):
 		date = now + datetime.timedelta(days=days)
 		temp = data.get(date.year, {})
@@ -83,7 +87,12 @@ async def scheduled_data() -> dict:
 		scheduled_data.cdtime = datetime.datetime.now() + datetime.timedelta(hours=23)
 	return scheduled_data.data
 
-@sv.on_fullmatch(TIMEAPAN.keys())
+@sv_query.on_fullmatch(TIMEAPAN.keys())
 async def calendar(bot, ev: CQEvent):
 	msg = get_calendar(await scheduled_data(), limit=TIMEAPAN[ev['prefix']])
 	await bot.send(ev, msg, at_sender=False)
+
+@sv_push.scheduled_job('cron', hour='8', minute='0', timezone=TZ)
+async def daily_activities_push():
+	msg = '今日国服日程' + get_calendar(await scheduled_data(), limit=1)
+	await svtw.broadcast(msg, TAG='bcr-daily-activities-push', interval_time=0.5)
