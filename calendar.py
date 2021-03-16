@@ -41,15 +41,10 @@ def parse_raw_data(raw_data: list) -> dict:
 		raise Exception('raw data not found!')
 	data = {}
 	for item in raw_data:
-		year = int(item['year'])
-		month = int(item['month'])
-		if year not in data:
-			data[year] = {}
-		if month not in data[year]:
-			data[year][month] = {}
+		year = data.setdefault(int(item['year']), {})
+		month = year.setdefault(int(item['month']), {})
 		for key, value in item['day'].items():
-			day = int(key)
-			data[year][month][day] = value
+			month[int(key)] = value
 	return data
 
 def get_calendar(data: dict, limit: int=31) -> str:
@@ -79,7 +74,7 @@ def get_calendar(data: dict, limit: int=31) -> str:
 		result.append('\n'.join(['==========', date.strftime('%Y-%m-%d'), msg]))
 	return '\n'.join(result)
 
-async def scheduled_data():
+async def scheduled_data() -> dict:
 	# update once everyday
 	if (not hasattr(scheduled_data, 'data')) or \
 		(not hasattr(scheduled_data, 'cdtime')) or \
