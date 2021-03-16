@@ -5,6 +5,7 @@ import json
 import re
 import datetime
 import lxml.html
+import pytz
 
 from hoshino import Service
 from hoshino.typing import CQEvent
@@ -92,7 +93,7 @@ async def calendar(bot, ev: CQEvent):
 	msg = get_calendar(await scheduled_data(), limit=TIMEAPAN[ev['prefix']])
 	await bot.send(ev, msg, at_sender=False)
 
-@sv_push.scheduled_job('cron', hour='8', minute='0', timezone=TZ)
+@sv_push.scheduled_job('cron', hour='8', minute='0', timezone=pytz.timezone('Asia/Shanghai'))
 async def daily_activities_push():
 	msg = '今日国服日程' + get_calendar(await scheduled_data(), limit=1)
 	await svtw.broadcast(msg, TAG='bcr-daily-activities-push', interval_time=0.5)
