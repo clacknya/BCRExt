@@ -95,5 +95,5 @@ async def calendar(bot, ev: CQEvent):
 
 @sv_push.scheduled_job('cron', hour='8', minute='0', timezone=pytz.timezone('Asia/Shanghai'))
 async def daily_activities_push():
-	msg = '今日国服日程' + get_calendar(await scheduled_data(), limit=1)
+	msg = '今日国服日程\n' + get_calendar(await scheduled_data(), limit=1)
 	await sv_push.broadcast(msg, TAG='bcr-daily-activities-push', interval_time=0.5)
