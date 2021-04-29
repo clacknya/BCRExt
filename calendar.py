@@ -32,7 +32,7 @@ sv_push = Service('公主连结国服日程推送', help_='每日推送当日日
 async def get_raw_data() -> list:
 	sv_query.logger.info(f'GET {URL_CALENDAR}')
 	r = await get(URL_CALENDAR)
-	m = re.search(r'\bdata\s*=\s*(?=\[)(?P<json>.+)(?<=\])', await r.text, flags=re.DOTALL)
+	m = re.search(r'\bdata\s*=\s*(?=\[)(?P<json>.+)(?<=(?:\s|\})\])', await r.text, flags=re.DOTALL)
 	if m is not None:
 		raw_string = m.group('json')
 		# remove trailing commas
