@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
-import json
+import yaml
 import re
 import datetime
 import lxml.html
@@ -37,7 +37,7 @@ async def get_raw_data() -> list:
 		raw_string = m.group('json')
 		# remove trailing commas
 		std_string = re.sub(r',\s*(}|\])', r'\1', raw_string)
-		return json.loads(std_string)
+		return yaml.load(std_string, Loader=yaml.FullLoader)
 	else:
 		raise Exception('regex search failed!')
 	return None
